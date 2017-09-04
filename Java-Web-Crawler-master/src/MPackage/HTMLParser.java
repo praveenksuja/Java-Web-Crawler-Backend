@@ -1,4 +1,4 @@
-package MPackage;
+package org.backend;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import java.io.BufferedReader;
@@ -75,6 +75,31 @@ public class HTMLParser {
         }
     }
 
+    public static void putData1(String URL, String Title) {
+        String cleanTitle = "";
+        try {
+            String query;
+            Class.forName("java.sql.DriverManager");
+            java.sql.Connection con3 = DriverManager.getConnection("jdbc:mysql://localhost/jproject", "root", "password");
+            Statement st3 = con3.createStatement();
+            //cleanTitle = Title.replace("'s", "");
+            cleanTitle = Title.replace("'", " ");
+            int pageRank = getPR(getDomain(URL));
+            query = "insert into crawler_db(URL,URL_id,Title,PageRank) values('" + URL + "','" + URL.hashCode() + "','" + cleanTitle.toLowerCase() + "',"+pageRank+");";
+            st3.executeUpdate(query);
+            con3.close();
+            st3.close();
+        } catch (MySQLIntegrityConstraintViolationException sqle) {
+            System.out.println("A link already exists!");
+        } catch (Exception e) {
+            System.out.println(URL);
+            System.out.println(Title);
+            System.out.println(cleanTitle);
+            System.out.println("Something is wrong with the above data!");
+            //e.printStackTrace();
+        }
+
+    }
     public static String getDomain(String url) throws MalformedURLException {
         String cleanUrl = url.toLowerCase().trim();
         URL link = new URL(cleanUrl);
@@ -102,3 +127,4 @@ public class HTMLParser {
 
     }
 }
+
